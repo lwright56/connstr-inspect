@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "connstr-inspect"
+version = "0.1.0"
+description = "Parse and inspect database connection strings from the command line"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "lwright56" }]
+
+[project.scripts]
+connstr = "connstr.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["connstr*"]
