@@ -87,3 +87,9 @@ $ python -m connstr.cli "postgres://user:pass@localhost/db"
 ## Requirements
 
 Python 3.9+. No third-party dependencies.
+
+## Tests
+
+```
+$ python -m unittest discover
+```
