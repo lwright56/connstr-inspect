@@ -109,6 +109,57 @@ class KeywordFormatTests(unittest.TestCase):
         self.assertEqual(info.password, "s3cret")
 
 
+class JdbcFormatTests(unittest.TestCase):
+    def test_jdbc_postgresql_url_style(self):
+        info = parse("jdbc:postgresql://appuser:s3cret@db.internal:5432/billing?ssl=true")
+        self.assertEqual(info.format, "jdbc")
+        self.assertEqual(info.scheme, "postgresql")
+        self.assertEqual(info.user, "appuser")
+        self.assertEqual(info.password, "s3cret")
+        self.assertEqual(info.host, "db.internal")
+        self.assertEqual(info.port, 5432)
+        self.assertEqual(info.database, "billing")
+        self.assertEqual(info.params, {"ssl": "true"})
+
+    def test_jdbc_mysql_url_style_without_credentials(self):
+        info = parse("jdbc:mysql://db.internal:3306/billing")
+        self.assertIsNone(info.user)
+        self.assertIsNone(info.password)
+        self.assertEqual(info.host, "db.internal")
+        self.assertEqual(info.port, 3306)
+        self.assertEqual(info.database, "billing")
+
+    def test_jdbc_sqlserver_semicolon_properties(self):
+        info = parse(
+            "jdbc:sqlserver://sql.internal:1433;databaseName=billing;user=svc;password=s3cret;encrypt=true"
+        )
+        self.assertEqual(info.format, "jdbc")
+        self.assertEqual(info.scheme, "sqlserver")
+        self.assertEqual(info.host, "sql.internal")
+        self.assertEqual(info.port, 1433)
+        self.assertEqual(info.database, "billing")
+        self.assertEqual(info.user, "svc")
+        self.assertEqual(info.password, "s3cret")
+        self.assertEqual(info.params, {"encrypt": "true"})
+
+    def test_jdbc_sqlserver_without_explicit_port(self):
+        info = parse("jdbc:sqlserver://sql.internal;databaseName=billing")
+        self.assertEqual(info.host, "sql.internal")
+        self.assertIsNone(info.port)
+        self.assertEqual(info.database, "billing")
+
+    def test_jdbc_without_authority_keeps_driver_name_only(self):
+        info = parse("jdbc:h2:mem:testdb")
+        self.assertEqual(info.format, "jdbc")
+        self.assertEqual(info.scheme, "h2")
+        self.assertIsNone(info.host)
+        self.assertIsNone(info.database)
+
+    def test_jdbc_password_is_redacted_by_default(self):
+        info = parse("jdbc:postgresql://user:s3cret@db.internal/billing")
+        self.assertEqual(info.to_dict()["password"], REDACTED)
+
+
 class RedactionTests(unittest.TestCase):
     def test_password_redacted_by_default(self):
         info = parse("postgres://user:s3cret@db.internal/billing")

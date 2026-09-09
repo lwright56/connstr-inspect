@@ -4,11 +4,13 @@ A command line tool for parsing database connection strings and showing
 their parts: host, port, database, user, and so on, without pasting the
 whole string somewhere just to eyeball whether the port is right.
 
-It handles the two shapes that show up in practice:
+It handles the shapes that show up in practice:
 
 - URL style, e.g. `postgres://user:pass@host:5432/dbname?sslmode=require`
 - keyword/value style, e.g. `Server=tcp:host,1433;Database=db;User ID=user;Password=pass;`
   (the ADO.NET / ODBC form used by SQL Server and some MySQL drivers)
+- JDBC style, e.g. `jdbc:postgresql://user:pass@host:5432/dbname?ssl=true` or
+  `jdbc:sqlserver://host:1433;databaseName=db;user=user;password=pass;`
 
 Passwords are redacted by default in both output modes, because connection
 strings get pasted into terminals, issue trackers, and Slack more often than
